@@ -8,7 +8,34 @@ const pathNewFolder = path.join(__dirname, 'files-copy');
 const pathFolder = path.join(__dirname, 'files');
 
 
-fs.mkdir(pathNewFolder, {recursive: true}, () => {});
+const mkDir = async () => {
+  try {
+    await fsPromises.mkdir(pathNewFolder, {recursive: true}, () => {});
+    clearDir();
+  } catch (err) {
+    if (err) throw err;
+  }
+}
+
+const clearDir = () => {
+  fs.readdir(pathNewFolder, (err, files) => {
+    if (err) throw err;
+    if (files.length) {
+      for (let file of files) {
+        let pathNewFile = path.join(__dirname, 'files-copy', `${file}`);
+        fs.stat(pathNewFile, (err, stats) => {
+          if (err) throw err;
+          if (!stats.isDirectory()) {
+            fs.unlink(pathNewFile, err => {
+              if (err) throw err;
+              if (file === files[files.length - 1]) readFolder();
+            });
+          }
+        });
+      }
+    } else readFolder();
+  })
+}
 
 async function readFolder() {
     let files;
@@ -19,9 +46,6 @@ async function readFolder() {
             let pathNewFile = path.join(__dirname, 'files-copy', `${file}`);
 
             fsPromises.copyFile(`${pathFile}`, `${pathNewFile}`)
-            // .then(function() {
-            //     console.log("File Copied");
-            //   })
               .catch(function(error) {
                 console.log(error);
               });
@@ -32,7 +56,7 @@ async function readFolder() {
    console.error(err);
  }
 }
-readFolder()
+mkDir()
 
 
 
