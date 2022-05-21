@@ -15,7 +15,7 @@ const mkDir = async () => {
   } catch (err) {
     if (err) throw err;
   }
-}
+};
 
 const clearDir = () => {
   fs.readdir(pathNewFolder, (err, files) => {
@@ -34,29 +34,29 @@ const clearDir = () => {
         });
       }
     } else readFolder();
-  })
-}
+  });
+};
 
 async function readFolder() {
-    let files;
-    try {
-        files = await readdir(pathFolder);
-        files.forEach(function(file) {
-            let pathFile = path.join(__dirname, 'files', `${file}`);
-            let pathNewFile = path.join(__dirname, 'files-copy', `${file}`);
+  let files;
+  try {
+    files = await readdir(pathFolder);
+    files.forEach(function(file) {
+      let pathFile = path.join(__dirname, 'files', `${file}`);
+      let pathNewFile = path.join(__dirname, 'files-copy', `${file}`);
 
-            fsPromises.copyFile(`${pathFile}`, `${pathNewFile}`)
-              .catch(function(error) {
-                console.log(error);
-              });
-        })
-    console.log("Files Copied");
-    }
-    catch (err) {
-   console.error(err);
- }
+      fsPromises.copyFile(`${pathFile}`, `${pathNewFile}`)
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
+    console.log('Files Copied');
+  }
+  catch (err) {
+    console.error(err);
+  }
 }
-mkDir()
+mkDir();
 
 
 
