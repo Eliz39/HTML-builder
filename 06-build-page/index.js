@@ -17,16 +17,35 @@ const mkDir = async () => {
 mkDir();
 
 const pathAssetsDist =  path.join(__dirname, 'project-dist', 'assets');
-// const pathAssetsFolder = path.join(__dirname, 'assets');
+const pathAssetsFolder = path.join(__dirname, 'assets');
 
 const mkAssetsDir = async () => {
   try {
     await fsPromises.mkdir(pathAssetsDist, {recursive: true}, () => {});
-    // copyAssets(pathAssetsFolder);
+    copyAssets(pathAssetsFolder, pathAssetsDist);
   } catch (err) {
     if (err) throw err;
   }
 };
+
+async function copyAssets(from, to) {
+  await fsPromises.rm(to, { force: true, recursive: true });
+  await fsPromises.mkdir(to, { recursive: true });
+
+  const files = await fsPromises.readdir(from, { withFileTypes: true });
+
+  for (let file of files) {
+    const filePath = path.join(from, file['name']);
+    const copyFilePath = path.join(to, file['name']);
+
+    if (file.isFile()) {
+      await fsPromises.copyFile(filePath, copyFilePath);
+    } else {
+      await fsPromises.mkdir(copyFilePath, { recursive: true });
+      await copyAssets(filePath, copyFilePath);
+    }
+  }
+}
 
 
 const pathFolderStyles = path.join(__dirname, 'styles');
